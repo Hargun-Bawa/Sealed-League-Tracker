@@ -2,7 +2,7 @@ import sqlite3
 from tkinter import *
 from tkinter import messagebox
 
-"""THIS PROGRAM IS MEANT TO KEEP TRACK OF PLAYERS IN A WEEKLY TOURNAMENT THAT DEVIDES THE PLAYERS INTO PODS OF FOUR. 
+"""THIS PROGRAM IS MEANT TO KEEP TRACK OF PLAYERS IN A WEEKLY TOURNAMENT THAT DIVIDES THE PLAYERS INTO PODS OF FOUR. 
 IT WILL KEEP TRACK OF POINT TOTALS, WEEKLY RECORDS, AND WEEKLY MATCHES. """
 
 # Connect or create a database for the sealed league information to be stored
@@ -11,12 +11,138 @@ conn = sqlite3.connect('sealed_leagues.db')
 # Create a cursor to interact with the database
 c = conn.cursor()
 
+# Creates constants that refer to specific players in the Database
+c.execute("SELECT player_name FROM league WHERE rowid = 1")
+player_1 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 2")
+player_2 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 3")
+player_3 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 4")
+player_4 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 5")
+player_5 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 6")
+player_6 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 7")
+player_7 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 8")
+player_8 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 9")
+player_9 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 10")
+player_10 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 11")
+player_11 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 12")
+player_12 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 13")
+player_13 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 14")
+player_14 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 15")
+player_15 = c.fetchall()[0]
+c.execute("SELECT player_name FROM league WHERE rowid = 16")
+player_16 = c.fetchall()[0]
+
+
+# CREATES A COPYABLE WINDOW WITH ALL OF THE PODS OF PLAYERS LISTED
+def show_pods(pods):
+    pod_num = 1
+    final_string = ""
+    for pod in pods:
+        new_string = "Pod " + str(pod_num) + "\n\n"
+        for player in pod:
+            new_string = new_string + str(player[0]) + ",\n"
+        final_string = final_string + "\n" + new_string
+        pod_num += 1
+    w3 = Toplevel()
+    final = final_string
+    tex = Text(w3, height=50, borderwidth=0)
+    tex.insert(1.0, final)
+    tex.pack()
+    tex.configure(state="disabled")
+
+
+# WORK IN PROGRESS, IS SUPPOSED TO MAKE A WINDOW THAT HAS MENUS FOR EACH MATCH, YOU SHOULD BE ABLE TO SELECT RECORD OF
+# THE MATCH AND SAVE IT TO THE DATABASE
+def report_pairings(pods):
+    # THIS IS SUPPOSED TO BE THE ACTUAL SAVE BUTTON FUNCTION
+    def update_score():
+        pass
+
+    w4 = Toplevel()
+    matches = []
+    # FROM EACH POD CREATES SIX PAIRS MADE OF EACH OF THE FOUR POD MEMBERS.
+    for pod in pods:
+        for player in pod:
+            for player2 in pod:
+                if player != player2:
+                    new_list = [player[0], player2[0]]
+                    new_list.sort()
+                    if new_list not in matches:
+                        matches.append(new_list)
+    # REFORM PODS BUT THIS TIME WITH MATCHES NOT JUST PLAYERS
+    pod_1 = matches[0:5]
+    pod_2 = matches[6:11]
+    pod_3 = matches[12:17]
+    pod_4 = matches[18:23]
+    match_pods = [pod_1, pod_2, pod_3, pod_4]
+
+    # WORK IN PROGRESS CREATES THE DROPDOWN MENUS FOR EACH PAIR AND SEPARATES THE PODS BY COLUMN
+    col = -1
+    podnum = 1
+    for pod in match_pods:
+        pod.sort()
+        col += 1
+        label2 = Label(w4, text="Pod " + str(podnum), padx=10, pady=25)
+        label2.grid(row=0, column=col)
+        r = 1
+        podnum += 1
+
+        # FILLS IN THE COLUMNS WITH THE MENUS, WORKING ON HOW TO RETRIEVE THE VALUES FROM THE MENUS AND UPDATE THE
+        # DATABASE
+        for match in pod:
+            scores = [
+                match[0] + "  0-0  " + match[1],
+                match[0] + "  2-0  " + match[1],
+                match[0] + "  2-1  " + match[1],
+                match[0] + "  1-2  " + match[1],
+                match[0] + "  0 -2  " + match[1]
+            ]
+            clicked = StringVar()
+            clicked.set(match[0] + "  0-0  " + match[1])
+            drop = OptionMenu(w4, clicked, *scores)
+            drop.grid(column=col, row=r, padx=5, pady=10)
+
+            r += 1
+    # TRYING TO MAKE ONE BUTTON THAT UPLOADS ALL BOXES ONTO THE DATABASE
+    save_button = Button(w4, text="Update Results", command=update_score, padx=50)
+    save_button.grid(row=12, column=0, columnspan=4, pady=20)
+
+
+# BREAKS THE 16 PLAYERS INTO PREDETERMINED PODS OF FOUR AND ALLOWS YOU TO NAVIGATE TO A PAGE WHERE THE PODS ARE
+# LISTED TO BE COPIED, OR TO A PAGE WHERE YOU CAN INSERT THE RESULTS OF THE MATCHES FOR THE WEEK.
+def week_one():
+    w1 = Toplevel()
+    pod_1 = [player_1, player_2, player_3, player_4]
+    pod_2 = [player_5, player_6, player_7, player_8]
+    pod_3 = [player_9, player_10, player_11, player_12]
+    pod_4 = [player_13, player_14, player_15, player_16]
+    pods = [pod_1, pod_2, pod_3, pod_4]
+
+    show_pods_button = Button(w1, text="Show pods", command=lambda: show_pods(pods))
+    show_pods_button.grid(row=1, column=0)
+
+    report_scores_button = Button(w1, text="Report scores", command=lambda: report_pairings(pods))
+    report_scores_button.grid(row=2, column=0)
+
 
 # On creation of a new League creates a window for user to enter up to 16 names, and then commits them to the database.
 def enter_players():
     players = []
 
-    # Takes the user input and puts it into a list, when the list hits maximum capacity for the tourney promts user
+    # Takes the user input and puts it into a list, when the list hits maximum capacity for the tourney prompts user
     # to close the windows And commits the list to the database
     def save_player():
 
@@ -82,7 +208,7 @@ def load_league():
     standings_button = (Button(players_screen, text="Standings", padx=21, pady=5))
     standings_button.grid(row=1, column=0, padx=15, pady=5)
 
-    week_one_button = (Button(players_screen, text="Week One", padx=19, pady=5))
+    week_one_button = (Button(players_screen, text="Week One", padx=19, pady=5, command=week_one))
     week_one_button.grid(row=2, column=0, padx=15, pady=5)
 
     week_two_button = (Button(players_screen, text="Week Two", padx=19, pady=5))
